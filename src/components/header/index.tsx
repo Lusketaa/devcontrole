@@ -1,5 +1,8 @@
+"use client"
+
 import Link from "next/link";
 import { FiUser, FiLogOut } from "react-icons/fi";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export function Header() {
     return (
