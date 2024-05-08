@@ -2,8 +2,10 @@ import { Container } from "@/components/container";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
+
 import Link from "next/link";
 import { Card } from "./components/card";
+import prismaClient from '@/lib/prisma';
 
 export default async function Customer() {
     const session = await getServerSession(authOptions)
@@ -12,6 +14,12 @@ export default async function Customer() {
         redirect("/")
     }
 
+    const customers = await prismaClient.customer.findMany({
+        where: {
+            userId: session.user.id
+        }
+    })
+    
     return(
         <Container>
             <main className="mt-9 mb-2">
@@ -23,12 +31,16 @@ export default async function Customer() {
                 </div>
 
                 <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
-                    <Card />
-                    <Card />
-                    <Card />
+                    {
+                        customers.map(customer => (
+                            <Card 
+                                key={customer.id}
+                                customer={customer}
+                            />
+                        ))}     
                 </section>
+                {customers.length === 0 && <p className="text-center text-xl text-gray-500 mt-10">Nenhum cliente encontrado</p>}
             </main>
         </Container>
-        
     )
 }

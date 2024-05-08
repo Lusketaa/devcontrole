@@ -1,5 +1,7 @@
 import { Container } from "@/components/container";
 import Link from "next/link";
+import { NewCustomerForm } from "../components/form";
+
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
@@ -20,9 +22,10 @@ export default async function NewCustomer() {
                     </Link>
                     <h1 className="text-3xl font-bold">Novo Cliente</h1>
                 </div>
+
+                <NewCustomerForm userId={session.user.id} />
+
             </main>
-
-
         </Container>
     )
 }

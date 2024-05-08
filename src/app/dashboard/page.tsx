@@ -5,6 +5,8 @@ import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import { Ticket } from "./components/ticket";
 
+import prismaClient from '@/lib/prisma'
+ 
 export default async function Dashboard() {
   const session = await getServerSession(authOptions)
 
@@ -12,6 +14,18 @@ export default async function Dashboard() {
     redirect("/")
   }
 
+  const tickets = await prismaClient.ticket.findMany({
+    where: {
+      userId: session.user.id,
+      status: 'Aberto'
+    },
+    include: {
+        customer: true
+    },
+    orderBy: {
+      created_at: 'desc'
+    }
+  })
 
   return (
     <Container>
@@ -33,10 +47,17 @@ export default async function Dashboard() {
                         </tr>
                     </thead>
                     <tbody>
-                        <Ticket />
-                        <Ticket />
+                        {tickets.map(ticket => (
+                            <Ticket key={ticket.id}
+                            customer={ticket.customer}
+                            ticket={ticket}
+                        />
+                        ))}
                     </tbody>
                 </table>
+                {tickets.length === 0 && (
+                    <p className="text-center text-xl text-gray-500 mt-10">Nenhum chamado aberto</p>
+                )}
             </main>
     </Container>
   )
